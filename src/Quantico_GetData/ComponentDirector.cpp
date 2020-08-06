@@ -89,12 +89,13 @@ void ComponentDirector::OnRenderCustomWindow()
             Gears::API::WaypointAspectAPIv2()->SetType(waypoint, kWaypointType_move);
             GeoPosition_v5 position = {};
             Gears::API::TransformationAspectAPIv5()->GetPosition(soldier, &position);
-            GeoPosition_v5 position2;
-            position2.latitude = position.latitude -10;
-            position2.longitude = position.longitude-10;
-            position2.altitude = position.altitude;
-            position.altitude_reference = kAltitudeReference_geoid;
-            Gears::API::TransformationAspectAPIv5()->SetPosition(waypoint, position2);
+            Vector3f64_v3 mapposition = {};
+            Gears::API::WorldAPIv6()->GeoPositionToMapPosition(position, &mapposition);
+            //change mapposition x,y,z to change position of waypoint at an offset of soldier
+            mapposition.z = mapposition.z - 10;
+            mapposition.x = mapposition.x + 5;
+            Gears::API::WorldAPIv6()->MapPositionToGeoPosition(mapposition, &position);
+            Gears::API::TransformationAspectAPIv5()->SetPosition(waypoint, position);
             
             Gears::API::WaypointAspectAPIv2()->SetAssignedTo(waypoint, grp, -1);
         }
