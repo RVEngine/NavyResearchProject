@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="include">
+      <UniqueIdentifier>{89AF369E-F58E-B539-FEA6-40106A051C9B}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="include\Resources">
+      <UniqueIdentifier>{3394DBFB-9FAA-D991-E821-65B35477AA19}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="include">
+      <UniqueIdentifier>{89AF369E-F58E-B539-FEA6-40106A051C9B}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="include\Quantico_GetDataUnitTest">
+      <UniqueIdentifier>{15D963E6-012A-4F28-2A8E-3DEA163EE291}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src">
+      <UniqueIdentifier>{2DAB880B-99B4-887C-2230-9F7C8E38947C}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\Quantico_GetDataUnitTest">
+      <UniqueIdentifier>{39F5B0D8-25B0-A084-CE67-19CFBA01EB14}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\include\Quantico_GetDataUnitTest\Quantico_GetDataUnitTest.h">
+      <Filter>include\Quantico_GetDataUnitTest</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\Resources\Version.h">
+      <Filter>include\Resources</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\Resources\resource.h">
+      <Filter>include\Resources</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\src\Quantico_GetDataUnitTest\GTest.cpp">
+      <Filter>src\Quantico_GetDataUnitTest</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\Quantico_GetDataUnitTest\Quantico_GetDataUnitTest.cpp">
+      <Filter>src\Quantico_GetDataUnitTest</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="..\..\include\Resources\Resources.rc">
+      <Filter>include\Resources</Filter>
+    </ResourceCompile>
+  </ItemGroup>
+</Project>

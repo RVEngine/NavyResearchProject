@@ -1,0 +1,162 @@
+Name: Quantico_GetData
+GitRemoteUrl: https://github.com/supermo55/NavyResearchProject.git
+Compilers:
+- vs2019
+ImplementedAPIs:
+- Name: ComponentAPI
+  Version: 6
+- Name: ApplicationListenerAPI
+  Version: 1
+- Name: ControlAIAspectAPI
+  Version: 1
+- Name: DebugUIListenerAPI
+  Version: 2
+- Name: MissionEditorAPI
+  Version: 2
+- Name: MissionEditorListenerAPI
+  Version: 2
+- Name: MissionListenerAPI
+  Version: 3
+- Name: WorldListenerAPI
+  Version: 2
+Dependencies:
+- Project: Component
+  Type: DLL
+  Language: C++
+  Deploy: Component
+  ExtraWarnings: true
+  TreatWarningsAsErrors: true
+  GlobalDefinitions:
+  - Syntax: x64
+  - Syntax: _CRT_SECURE_NO_WARNINGS
+  - Syntax: _SCL_SECURE_NO_WARNINGS
+  DebugDefinitions:
+  - Syntax: DEBUG
+  ReleaseDefinitions:
+  - Syntax: NDEBUG
+  ReleaseWithSymbolsDefinitions: []
+  DependsOn:
+  - Name: Library
+  Dependencies:
+  - Name: APIHelper
+    Version: 1
+  - Name: LogAPI
+    Version: 1
+  - Name: WorldAPI
+    Version: 6
+  - Name: SimulationAspectAPI
+    Version: 1
+  - Name: EnvironmentAPI
+    Version: 3
+  - Name: TransformationAspectAPI
+    Version: 5
+  - Name: LifeformAspectAPI
+    Version: 3
+  - Name: IMGuiAPI
+    Version: 1
+  - Name: DebugUIAPI
+    Version: 2
+  - Name: CameraAspectAPI
+    Version: 3
+  - Name: MissionAPI
+    Version: 4
+  - Name: ScriptAPI
+    Version: 3
+  - Name: DamageAspectAPI
+    Version: 4
+  - Name: WeaponSystemAspectAPI
+    Version: 6
+  - Name: WaypointAspectAPI
+    Version: 2
+  - Name: pqxx
+    Version: 7.1.9
+  - Name: ORBATAPI
+    Version: 2
+  - Name: ComponentAPI
+    Version: 6
+  - Name: ApplicationListenerAPI
+    Version: 1
+  - Name: ControlAIAspectAPI
+    Version: 1
+  - Name: DebugUIListenerAPI
+    Version: 2
+  - Name: MissionEditorAPI
+    Version: 2
+  - Name: MissionEditorListenerAPI
+    Version: 2
+  - Name: MissionListenerAPI
+    Version: 3
+  - Name: WorldListenerAPI
+    Version: 2
+  UUID: 276b43dc-fab0-4e94-8264-bb9de015dc64
+- Project: Library
+  Type: LIB
+  Language: C++
+  LinkOptions: "/MACHINE:X64"
+  ExtraWarnings: true
+  TreatWarningsAsErrors: true
+  GlobalDefinitions:
+  - Syntax: x64
+  - Syntax: _CRT_SECURE_NO_WARNINGS
+  - Syntax: _SCL_SECURE_NO_WARNINGS
+  DebugDefinitions:
+  - Syntax: DEBUG
+  ReleaseDefinitions:
+  - Syntax: NDEBUG
+  ReleaseWithSymbolsDefinitions: []
+  Dependencies:
+  - Name: ComponentAPI
+    Version: 6
+  - Name: ApplicationListenerAPI
+    Version: 1
+  - Name: ControlAIAspectAPI
+    Version: 1
+  - Name: DebugUIListenerAPI
+    Version: 2
+  - Name: MissionEditorAPI
+    Version: 2
+  - Name: MissionEditorListenerAPI
+    Version: 2
+  - Name: MissionListenerAPI
+    Version: 3
+  - Name: WorldListenerAPI
+    Version: 2
+  UUID: 4f95a676-54c8-4ea2-baaf-84c0ef0f4d7b
+- Project: UnitTest
+  Type: Console EXE
+  Language: C++
+  ExtraWarnings: true
+  TreatWarningsAsErrors: true
+  GlobalDefinitions:
+  - Syntax: x64
+  - Syntax: _CRT_SECURE_NO_WARNINGS
+  - Syntax: _SCL_SECURE_NO_WARNINGS
+  DebugDefinitions:
+  - Syntax: DEBUG
+  ReleaseDefinitions:
+  - Syntax: NDEBUG
+  ReleaseWithSymbolsDefinitions: []
+  DependsOn:
+  - Name: Library
+  Dependencies:
+  - Name: GTest
+    Version: 1.6.2
+  - Name: ComponentAPI
+    Version: 6
+  - Name: ApplicationListenerAPI
+    Version: 1
+  - Name: ControlAIAspectAPI
+    Version: 1
+  - Name: DebugUIListenerAPI
+    Version: 2
+  - Name: MissionEditorAPI
+    Version: 2
+  - Name: MissionEditorListenerAPI
+    Version: 2
+  - Name: MissionListenerAPI
+    Version: 3
+  - Name: WorldListenerAPI
+    Version: 2
+  UUID: 04511d2c-37f5-4a1b-9778-6276a2ff868e
+YmlVersion: 6
+UsingPropertyFiles: true

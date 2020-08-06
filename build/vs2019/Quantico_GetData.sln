@@ -1,0 +1,39 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 16
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Quantico_GetData", "Quantico_GetData.vcxproj", "{276B43DC-FAB0-4E94-8264-BB9DE015DC64}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Quantico_GetDataLibrary", "Quantico_GetDataLibrary.vcxproj", "{4F95A676-54C8-4EA2-BAAF-84C0EF0F4D7B}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Quantico_GetDataUnitTest", "Quantico_GetDataUnitTest.vcxproj", "{04511D2C-37F5-4A1B-9778-6276A2FF868E}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|x64 = Debug|x64
+		ReleaseWithSymbols|x64 = ReleaseWithSymbols|x64
+		Release|x64 = Release|x64
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{276B43DC-FAB0-4E94-8264-BB9DE015DC64}.Debug|x64.ActiveCfg = Debug|x64
+		{276B43DC-FAB0-4E94-8264-BB9DE015DC64}.Debug|x64.Build.0 = Debug|x64
+		{276B43DC-FAB0-4E94-8264-BB9DE015DC64}.ReleaseWithSymbols|x64.ActiveCfg = ReleaseWithSymbols|x64
+		{276B43DC-FAB0-4E94-8264-BB9DE015DC64}.ReleaseWithSymbols|x64.Build.0 = ReleaseWithSymbols|x64
+		{276B43DC-FAB0-4E94-8264-BB9DE015DC64}.Release|x64.ActiveCfg = Release|x64
+		{276B43DC-FAB0-4E94-8264-BB9DE015DC64}.Release|x64.Build.0 = Release|x64
+		{4F95A676-54C8-4EA2-BAAF-84C0EF0F4D7B}.Debug|x64.ActiveCfg = Debug|x64
+		{4F95A676-54C8-4EA2-BAAF-84C0EF0F4D7B}.Debug|x64.Build.0 = Debug|x64
+		{4F95A676-54C8-4EA2-BAAF-84C0EF0F4D7B}.ReleaseWithSymbols|x64.ActiveCfg = ReleaseWithSymbols|x64
+		{4F95A676-54C8-4EA2-BAAF-84C0EF0F4D7B}.ReleaseWithSymbols|x64.Build.0 = ReleaseWithSymbols|x64
+		{4F95A676-54C8-4EA2-BAAF-84C0EF0F4D7B}.Release|x64.ActiveCfg = Release|x64
+		{4F95A676-54C8-4EA2-BAAF-84C0EF0F4D7B}.Release|x64.Build.0 = Release|x64
+		{04511D2C-37F5-4A1B-9778-6276A2FF868E}.Debug|x64.ActiveCfg = Debug|x64
+		{04511D2C-37F5-4A1B-9778-6276A2FF868E}.Debug|x64.Build.0 = Debug|x64
+		{04511D2C-37F5-4A1B-9778-6276A2FF868E}.ReleaseWithSymbols|x64.ActiveCfg = ReleaseWithSymbols|x64
+		{04511D2C-37F5-4A1B-9778-6276A2FF868E}.ReleaseWithSymbols|x64.Build.0 = ReleaseWithSymbols|x64
+		{04511D2C-37F5-4A1B-9778-6276A2FF868E}.Release|x64.ActiveCfg = Release|x64
+		{04511D2C-37F5-4A1B-9778-6276A2FF868E}.Release|x64.Build.0 = Release|x64
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal

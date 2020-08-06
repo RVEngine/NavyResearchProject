@@ -1,0 +1,6 @@
+#ifndef QUANTICO_GETDATA_UNITTEST_H
+#define QUANTICO_GETDATA_UNITTEST_H
+
+#include <CoreAPI.h>
+
+#endif

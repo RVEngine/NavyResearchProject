@@ -1,0 +1,2 @@
+Quantico_GetData Component
+=============

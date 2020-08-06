@@ -1,0 +1,9 @@
+# We recommend using Semantic Versioning for versioning binary files
+# https://semver.org/
+#
+# Manually modify MajorVersion and MinorVersion below to control the version embedded within the binary files.
+# The PatchVersion is automatically set and incremented by giri to ensure the full version number is always unique on Artifactory.
+
+MajorVersion: 0
+MinorVersion: 0
+#PatchVersion: Auto incremented by giri, not manually settable

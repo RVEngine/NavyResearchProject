@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="include">
+      <UniqueIdentifier>{89AF369E-F58E-B539-FEA6-40106A051C9B}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="include\Resources">
+      <UniqueIdentifier>{3394DBFB-9FAA-D991-E821-65B35477AA19}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="include">
+      <UniqueIdentifier>{89AF369E-F58E-B539-FEA6-40106A051C9B}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="include\Quantico_GetData">
+      <UniqueIdentifier>{3519E509-213E-348A-4A89-191A360D33A8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src">
+      <UniqueIdentifier>{2DAB880B-99B4-887C-2230-9F7C8E38947C}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\Quantico_GetData">
+      <UniqueIdentifier>{5951FA1C-45E0-83E6-EEFE-97E1DA6C948C}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\include\Quantico_GetData\Quantico_GetDataMock.h">
+      <Filter>include\Quantico_GetData</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\Quantico_GetData\Quantico_GetDataProxy.h">
+      <Filter>include\Quantico_GetData</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\Resources\Version.h">
+      <Filter>include\Resources</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\Resources\resource.h">
+      <Filter>include\Resources</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\src\Quantico_GetData\Quantico_GetDataComponent.cpp">
+      <Filter>src\Quantico_GetData</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\Quantico_GetData\Quantico_GetDataMock.cpp">
+      <Filter>src\Quantico_GetData</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\Quantico_GetData\Quantico_GetDataProxy.cpp">
+      <Filter>src\Quantico_GetData</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="..\..\include\Resources\Resources.rc">
+      <Filter>include\Resources</Filter>
+    </ResourceCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
+  </ItemGroup>
+</Project>
