@@ -86,15 +86,15 @@ void ComponentDirector::OnRenderCustomWindow()
             Gears::API::ORBATAPIv2()->SetSuperiorGroup(soldier, grp);
             ObjectHandle_v3 waypoint;
             Gears::API::WorldAPIv6()->CreateWaypoint(&waypoint);
-            Gears::API::WaypointAspectAPIv2()->SetType(waypoint, kWaypointType_move);
+            Gears::API::WaypointAspectAPIv2()->SetType(waypoint, kWaypointType_hold);
             GeoPosition_v5 position = {};
             Gears::API::TransformationAspectAPIv5()->GetPosition(soldier, &position);
-            Vector3f64_v3 mapposition = {};
-            Gears::API::WorldAPIv6()->GeoPositionToMapPosition(position, &mapposition);
-            //change mapposition x,y,z to change position of waypoint at an offset of soldier
-            mapposition.z = mapposition.z - 10;
-            mapposition.x = mapposition.x + 5;
+            Vector3f64_v3 soldierMaposition = {};
+            // x,y,z in vbs3 coordinates are shown in x,z,y
+            Vector3f64_v3 mapposition = {18471,3.9,14580};
+            Gears::API::WorldAPIv6()->GeoPositionToMapPosition(position, &soldierMaposition);
             Gears::API::WorldAPIv6()->MapPositionToGeoPosition(mapposition, &position);
+
             Gears::API::TransformationAspectAPIv5()->SetPosition(waypoint, position);
             
             Gears::API::WaypointAspectAPIv2()->SetAssignedTo(waypoint, grp, -1);

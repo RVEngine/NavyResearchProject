@@ -68,10 +68,10 @@ Dependencies:
     Version: 6
   - Name: WaypointAspectAPI
     Version: 2
-  - Name: pqxx
-    Version: 7.1.9
   - Name: ORBATAPI
     Version: 2
+  - Name: pqxx
+    Version: 7.1.10
   - Name: ComponentAPI
     Version: 6
   - Name: ApplicationListenerAPI

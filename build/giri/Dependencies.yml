@@ -50,11 +50,11 @@ Dependencies:
   Name: WaypointAspectAPI
   Version: 2
 - Group: Dependencies
-  Name: pqxx
-  Version: 7.1.9
-- Group: Dependencies
   Name: ORBATAPI
   Version: 2
+- Group: Dependencies
+  Name: pqxx
+  Version: 7.1.10
 - Group: Dependencies
   Name: ComponentAPI
   Version: 6
