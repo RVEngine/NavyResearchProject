@@ -147,6 +147,9 @@ void ConnectToSQL::UpdateOpFor(std::string message, int messageID)
         OutputDebugString(e.what());
     }
 }
+
+
+
 string ConnectToSQL::ReadandRemove()
 {
     connection C("dbname = units user = postgres password = ichigo \
@@ -169,6 +172,52 @@ string ConnectToSQL::ReadandRemove()
                 const field field4 = r[3];
                 std::stringstream commandstream;
                 commandstream << field2 << "," << field3 << "," << field4;
+                commandstream >> command;
+                const char* cstr = command.c_str();
+                OutputDebugString(cstr);
+                OutputDebugString("\n");
+                txn.exec_prepared("delete");
+                txn.commit();
+            }
+        }
+        else {
+            OutputDebugString("Can't open database");
+        }
+        C.disconnect();
+    }
+    catch (const std::exception& e) {
+        OutputDebugString(e.what());
+    }
+    return command;
+}
+
+string ConnectToSQL::ReadandRemoveWaypoint()
+{
+    connection C("dbname = units user = postgres password = ichigo \
+        hostaddr = 127.0.0.1 port = 5432");
+
+    C.prepare("read", "select * from waypointcommands limit 1;");
+    C.prepare("delete", "delete from waypointcommands;");
+    std::string command;
+    try {
+        if (C.is_open()) {
+            work txn(C);
+            row r = txn.exec_prepared1("read");
+            if (!r.empty())
+            {
+                txn.commit();
+                OutputDebugString("Row Read\n");
+                const field cID = r[0];
+                const field cmnd = r[1];
+                const field x = r[2];
+                const field y = r[3];
+                const field z = r[4];
+                const field u1 = r[5];
+                const field u2 = r[6];
+                const field u3 = r[7];
+                const field u4 = r[8];
+                std::stringstream commandstream;
+                commandstream << cmnd << "," << x << "," << y << "," << z << "," << u1 << "," << u2 << "," << u3 << "," << u4;
                 commandstream >> command;
                 const char* cstr = command.c_str();
                 OutputDebugString(cstr);

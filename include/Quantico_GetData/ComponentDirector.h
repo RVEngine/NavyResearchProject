@@ -21,6 +21,7 @@ public:
     void dateTimeThread(int messageID);
     void bluForThread(int messageID);
     void opForThread(int messageID);
+    void waypointCommandThread();
     void commandThread();
     std::string getSoldierInfo(char* soldierName);
 private:
