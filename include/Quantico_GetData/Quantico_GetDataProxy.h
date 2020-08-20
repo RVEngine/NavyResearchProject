@@ -18,6 +18,7 @@
 #include <MissionEditorAPI.h>
 #include <MissionEditorListenerAPI.h>
 #include <MissionListenerAPI.h>
+#include <WeaponSystemAspectListenerAPI.h>
 #include <WorldListenerAPI.h>
 
 GEARS_EXPORT void GEARS_API RegisterAPI_v6(APIManager_RegisterAPI_Func_v6 register_api);

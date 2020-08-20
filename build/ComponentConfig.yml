@@ -17,6 +17,8 @@ ImplementedAPIs:
   Version: 2
 - Name: MissionListenerAPI
   Version: 3
+- Name: WeaponSystemAspectListenerAPI
+  Version: 2
 - Name: WorldListenerAPI
   Version: 2
 Dependencies:
@@ -86,6 +88,8 @@ Dependencies:
     Version: 2
   - Name: MissionListenerAPI
     Version: 3
+  - Name: WeaponSystemAspectListenerAPI
+    Version: 2
   - Name: WorldListenerAPI
     Version: 2
   UUID: 276b43dc-fab0-4e94-8264-bb9de015dc64
@@ -119,6 +123,8 @@ Dependencies:
     Version: 2
   - Name: MissionListenerAPI
     Version: 3
+  - Name: WeaponSystemAspectListenerAPI
+    Version: 2
   - Name: WorldListenerAPI
     Version: 2
   UUID: 4f95a676-54c8-4ea2-baaf-84c0ef0f4d7b
@@ -155,6 +161,8 @@ Dependencies:
     Version: 2
   - Name: MissionListenerAPI
     Version: 3
+  - Name: WeaponSystemAspectListenerAPI
+    Version: 2
   - Name: WorldListenerAPI
     Version: 2
   UUID: 04511d2c-37f5-4a1b-9778-6276a2ff868e

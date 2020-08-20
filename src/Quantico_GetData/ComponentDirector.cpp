@@ -8,10 +8,9 @@
 #include<sstream> 
 #include <string>
 #include <stdio.h>
-#include <time.h>
 #include <stdlib.h>
 #include <thread>
-#include <map>
+
 
 
 ConnectToSQL s;
@@ -19,7 +18,6 @@ ConnectToSQL s;
 std::thread bluThread;
 //std::thread opThread;
 std::thread cthread;
-std::map<std::string, ObjectHandle_v3> soldierMap;
 void ComponentDirector::OnBeforeSimulation(_In_ float32_t delta)
 {
    
@@ -29,12 +27,12 @@ void ComponentDirector::OnBeforeSimulation(_In_ float32_t delta)
 void ComponentDirector::OnRenderMainWindow()
 {
     bool32_t pressed = FALSE;
-    SDKCheck(Gears::API::IMGuiAPIv1()->Button("Start Soldier Sample", { 180.0f, 30.0f }, &pressed));
+    SDKCheck(Gears::API::IMGuiAPIv1()->Button("Start Ambush Mission", { 180.0f, 30.0f }, &pressed));
     if (pressed != FALSE)
     {
         _sample_started = true;
 
-        SDKCheck(Gears::API::MissionAPIv4()->StartMission("ONR-SEI_Miss1_seq_b1.Sara", TRUE));
+        SDKCheck(Gears::API::MissionAPIv4()->StartMission("Ambush_At_Dusk.map_tropicalgeotypical25km", TRUE));
     }
 }
 
@@ -226,7 +224,7 @@ void ComponentDirector::waypointCommandThread()
 
             Gears::API::WaypointAspectAPIv2()->SetAssignedTo(waypoint, grp, -1);
         }
-        Sleep(10000);
+        Sleep(1000);
     }
 }
 void ComponentDirector::commandThread()
@@ -343,14 +341,30 @@ void ComponentDirector::bluForThread(int messageID)
     {
         if (_sample_started == true)
         {
-            std::string send = getSoldierInfo("RS1");
+            std::string send = getSoldierInfo("leftlead");
             s.UpdateBluFor(send, messageID);
-            send = getSoldierInfo("RS2");
-            s.UpdateBluFor(send, messageID+1);
-            send = getSoldierInfo("RS3");
-            s.UpdateBluFor(send, messageID+2);
-            send = getSoldierInfo("RS4");
-            s.UpdateBluFor(send, messageID+3);
+            send = getSoldierInfo("leftgunner");
+            s.UpdateBluFor(send, messageID + 1);
+            send = getSoldierInfo("l3");
+            s.UpdateBluFor(send, messageID + 2);
+            send = getSoldierInfo("l4");
+            s.UpdateBluFor(send, messageID + 3);
+            send = getSoldierInfo("mlead");
+            s.UpdateBluFor(send, messageID + 4);
+            send = getSoldierInfo("mgunner");
+            s.UpdateBluFor(send, messageID + 5);
+            send = getSoldierInfo("m3");
+            s.UpdateBluFor(send, messageID + 6);
+            send = getSoldierInfo("m4");
+            s.UpdateBluFor(send, messageID + 7);
+            send = getSoldierInfo("rightlead");
+            s.UpdateBluFor(send, messageID + 8);
+            send = getSoldierInfo("rightgunner");
+            s.UpdateBluFor(send, messageID + 9);
+            send = getSoldierInfo("r3");
+            s.UpdateBluFor(send, messageID + 10);
+            send = getSoldierInfo("r4");
+            s.UpdateBluFor(send, messageID + 11);
             Sleep(10000);
         }
         else
@@ -408,8 +422,8 @@ std::string ComponentDirector::getSoldierInfo(char* soldierName)
     if (it != soldierMap.end())
         _bluForSoldier = it->second;
     //unit_health
-    float32_t* damage=0;
-    Gears::API::DamageAspectAPIv4()->GetDamage(_bluForSoldier, damage);
+    float32_t damage=0;
+    Gears::API::DamageAspectAPIv4()->GetDamage(_bluForSoldier, &damage);
     std::stringstream damageStream;
     damageStream << damage;
 
@@ -425,14 +439,20 @@ std::string ComponentDirector::getSoldierInfo(char* soldierName)
     //unit_position
     GeoPosition_v5 position = {};
     Gears::API::TransformationAspectAPIv5()->GetPosition(_bluForSoldier, &position);
-    std::stringstream posStream;
-    posStream << "[" << position.altitude << ", " << position.latitude << ", " << position.longitude << "]";
+    std::stringstream posX;
+    std::stringstream posY;
+    std::stringstream posZ;
+    Vector3f64_v3 mapposition = {};
+    Gears::API::WorldAPIv6()->GeoPositionToMapPosition(position, &mapposition);
+    posX << mapposition.x;
+    posY << mapposition.y;
+    posZ << mapposition.z;
 
     //unit_orientation
     RotationalAngles_v3 orientation = {};
     Gears::API::TransformationAspectAPIv5()->GetOrientation(_bluForSoldier, &orientation);
     std::stringstream orientStream;
-    orientStream << "[" << orientation.yaw << ", " << orientation.pitch << ", " << orientation.roll << "]";
+    orientStream << orientation.yaw << ", " << orientation.pitch << ", " << orientation.roll;
  
 
     //unit_velocity
@@ -442,7 +462,7 @@ std::string ComponentDirector::getSoldierInfo(char* soldierName)
     veloStream << "{" << velocity.x << "," << velocity.y << "," << velocity.z << "}";
     
     //send string
-    send = std::string(soldierName) + ";" + damageStream.str() + ";" + ammoStream.str() + "; unit_type; " + posStream.str() + ";" + orientStream.str() + ";" + veloStream.str();
+    send = std::string(soldierName) + ";" + damageStream.str() + ";" + ammoStream.str() + "; unit_type; " + posX.str() + ";" + posY.str() + ";" + posZ.str() + ";" + orientStream.str() + ";" + veloStream.str();
     OutputDebugString(send.c_str());
     OutputDebugString("\n");
     return send;
@@ -524,5 +544,6 @@ void ComponentDirector::makeSoldierStop()
     Gears::API::LifeformAspectAPIv3()->SetStance(_soldier, kStance_crouch);
     Gears::API::TransformationAspectAPIv5()->SetModelVelocity(_soldier, { 0.0f,0.0f,0.0f });
 }
+
 
 

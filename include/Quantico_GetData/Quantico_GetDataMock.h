@@ -18,6 +18,7 @@
 #include <MissionEditorAPI.h>
 #include <MissionEditorListenerAPI.h>
 #include <MissionListenerAPI.h>
+#include <WeaponSystemAspectListenerAPI.h>
 #include <WorldListenerAPI.h>
 
 

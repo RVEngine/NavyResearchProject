@@ -2,6 +2,7 @@
 
 #include <CommonTypesAPI.h>
 #include <string>
+#include <map>
 
 class ComponentDirector
 {
@@ -11,7 +12,7 @@ public:
         static ComponentDirector instance;
         return instance;
     }
-    
+    std::map<std::string, ObjectHandle_v3> soldierMap;
     void OnBeforeSimulation(_In_ float32_t delta);
     void OnRenderMainWindow();
     void OnRenderCustomWindow();

@@ -18,6 +18,7 @@
 #include <MissionEditorAPI.h>
 #include <MissionEditorListenerAPI.h>
 #include <MissionListenerAPI.h>
+#include <WeaponSystemAspectListenerAPI.h>
 #include <WorldListenerAPI.h>
 
 APIResult GEARS_API Component_Initialize(_In_ const char* component_folder);
@@ -66,6 +67,9 @@ APIResult GEARS_API MissionListener_OnMissionEnd(_In_ bool32_t restart);
 APIResult GEARS_API MissionListener_OnMissionLoad(_In_ const char* mission_name);
 APIResult GEARS_API MissionListener_OnMissionUnload(_In_ const char* mission_name);
 APIResult GEARS_API MissionListener_OnPlayerSwitchedUnits(_In_ ObjectHandle_v3 old_entity, _In_ ObjectHandle_v3 new_entity);
+
+APIResult GEARS_API WeaponSystemAspectListener_OnFire(_In_ ObjectHandle_v3 shooter, _In_ ObjectHandle_v3 shot);
+APIResult GEARS_API WeaponSystemAspectListener_OnAmmoHit(_In_ const HitEvent_v2* hit_info);
 
 void GEARS_API WorldListener_OnObjectCreation(_In_ ObjectHandle_v3 object);
 void GEARS_API WorldListener_OnObjectDeletion(_In_ ObjectHandle_v3 object);

@@ -10,7 +10,6 @@
 
 using namespace std;
 using namespace pqxx;
-
 void ConnectToSQL::Update(std::string message, int messageID)
 {
     connection C("dbname = units user = postgres password = ichigo \
@@ -62,17 +61,23 @@ void ConnectToSQL::UpdateBluFor(std::string message, int messageID)
     std::string unit_type = message.substr(found2+1, found3-(found2+1));
 
     std::size_t found4 = message.find(";", found3 + 1);
-    std::string unit_position = message.substr(found3+1, found4-(found3+1));
+    std::string px = message.substr(found3+1, found4-(found3+1));
 
     std::size_t found5 = message.find(";", found4 + 1);
-    std::string unit_orientation = message.substr(found4+1, found5-(found4+1));
+    std::string py = message.substr(found4+1, found5-(found4+1));
 
     std::size_t found6 = message.find(";", found5 + 1);
-    std::string unit_velocity = message.substr(found5+1, found6-(found5+1));
+    std::string pz = message.substr(found5+1, found6-(found5+1));
+
+    std::size_t found7 = message.find(";", found6 + 1);
+    std::string unit_orientation = message.substr(found6 + 1, found7 - (found6 + 1));
+
+    std::size_t found8 = message.find(";", found5 + 1);
+    std::string unit_velocity = message.substr(found7 + 1, found8 - (found7 + 1));
 
     C.prepare("remove_previous", "delete from blufor where unit_name=$1;");
     C.prepare("insert_to_blufor",
-        "insert into blufor (unit_id, unit_name, unit_health, unit_ammo, unit_type, unit_position, unit_orientation, unit_velocity) values ($1, $2, $3, $4, $5, $6, $7, $8);");
+        "insert into blufor (unit_id, unit_name, unit_health, unit_ammo, unit_type, px, py, pz, unit_orientation, unit_velocity) values ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10);");
     try {
 
         //connection C("dbname = units user = postgres password = ichigo \      hostaddr = 127.0.0.1 port = 5432");
@@ -82,7 +87,7 @@ void ConnectToSQL::UpdateBluFor(std::string message, int messageID)
             txn.exec_prepared("remove_previous",unit_name);
             OutputDebugString("Previous Rows Removed\n");
             txn.commit();
-            txn.exec_prepared("insert_to_blufor", messageID, unit_name, unit_health, unit_ammo, unit_type, unit_position, unit_orientation, unit_velocity);
+            txn.exec_prepared("insert_to_blufor", messageID, unit_name, unit_health, unit_ammo, unit_type, px, py, pz, unit_orientation, unit_velocity);
             txn.commit();
             OutputDebugString("New Row Added\n");
         }
@@ -196,8 +201,8 @@ string ConnectToSQL::ReadandRemoveWaypoint()
     connection C("dbname = units user = postgres password = ichigo \
         hostaddr = 127.0.0.1 port = 5432");
 
-    C.prepare("read", "select * from waypointcommands limit 1;");
-    C.prepare("delete", "delete from waypointcommands;");
+    C.prepare("read", "select * from waypointcommands2 limit 1;");
+    C.prepare("delete", "delete from waypointcommands2 where ctid in (select ctid from waypointcommands2 limit 1);");
     std::string command;
     try {
         if (C.is_open()) {
@@ -235,4 +240,42 @@ string ConnectToSQL::ReadandRemoveWaypoint()
         OutputDebugString(e.what());
     }
     return command;
+}
+
+void ConnectToSQL::UpdateFireTable(std::string message, int messageID) {
+    connection C("dbname = units user = postgres password = ichigo \
+        hostaddr = 127.0.0.1 port = 5432");
+
+    std::size_t pos = message.find(";");
+    std::string unit_name = message.substr(0, pos);
+
+    std::size_t found = message.find(";", pos + 1);
+    std::string time = message.substr(pos + 1, found - (pos + 1));
+
+
+    C.prepare("remove_previous", "delete from enemyfire;");
+    C.prepare("insert_to_enemyfire",
+        "insert into enemyfire (unit_id, unit_name, time) values ($1, $2, $3);");
+    try {
+
+        //connection C("dbname = units user = postgres password = ichigo \      hostaddr = 127.0.0.1 port = 5432");
+        if (C.is_open()) {
+            OutputDebugString("Opened database successfully!\n");
+            work txn(C);
+            txn.exec_prepared("remove_previous", unit_name);
+            OutputDebugString("Previous Rows Removed\n");
+            txn.commit();
+            txn.exec_prepared("insert_to_enemyfire", messageID, unit_name, time);
+            txn.commit();
+            OutputDebugString("New Row Added\n");
+            
+        }
+        else {
+            OutputDebugString("Can't open database");
+        }
+        C.disconnect();
+    }
+    catch (const std::exception& e) {
+        OutputDebugString(e.what());
+    }
 }

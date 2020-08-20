@@ -159,6 +159,21 @@ GEARS_EXPORT void GEARS_API RegisterAPI_v6(APIManager_RegisterAPI_Func_v6 regist
     register_api(MissionListenerAPI_Handle, &api_info);
   }
 
+  //Register WeaponSystemAspectListenerAPI_v2
+  {
+    static WeaponSystemAspectListenerAPI_v2 api;
+    APIInfo_v6 api_info;
+
+    api.OnFire = WeaponSystemAspectListener_OnFire;
+    api.OnAmmoHit = WeaponSystemAspectListener_OnAmmoHit;
+
+    api_info._api = &api;
+    api_info._version = 2;
+    api_info._privilege = 0;
+
+    register_api(WeaponSystemAspectListenerAPI_Handle, &api_info);
+  }
+
   //Register WorldListenerAPI_v2
   {
     static WorldListenerAPI_v2 api;

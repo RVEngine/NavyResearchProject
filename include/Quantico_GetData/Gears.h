@@ -143,6 +143,7 @@
 #include <WorldListenerAPI.h>
 #include <WaypointAspectAPI.h>
 #include <ORBATAPI.h>
+#include <WeaponSystemAspectListenerAPI.h>
 
 class Gears : public APIHelper<Gears, APIManager_v6>
 {
@@ -167,6 +168,7 @@ public:
 //  REGISTER_API(WorldListenerAPI, 2, Single)
   REGISTER_API(WaypointAspectAPI, 2, Single)
   REGISTER_API(ORBATAPI, 2, Single)
+//  REGISTER_API(WeaponSystemAspectListenerAPI, 2, Single)
   END_APIS()
 
   START_MY_APIS(Gears)
@@ -181,6 +183,8 @@ public:
   REGISTER_MY_API(MissionEditorListenerAPI, 2)
   REGISTER_MY_API(DebugUIListenerAPI, 2)
   REGISTER_MY_API(WorldListenerAPI, 2)
+//  REGISTER_MY_API(WeaponSystemAspectListenerAPI, 2)
+  REGISTER_MY_API(WeaponSystemAspectListenerAPI, 2)
   END_MY_APIS()
 
 private:

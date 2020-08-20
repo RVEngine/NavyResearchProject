@@ -1,5 +1,4 @@
 #pragma once
-#include <CommonTypesAPI.h>
 #include <windows.h>
 #include <pqxx/pqxx>  
 #include <string>
@@ -11,6 +10,7 @@ public:
     void UpdateOpFor(std::string message, int messageID);
     std::string ReadandRemove();
     std::string ReadandRemoveWaypoint();
+    void ConnectToSQL::UpdateFireTable(std::string message, int messageID);
     static ConnectToSQL& Get()
     {
         static ConnectToSQL instance;
