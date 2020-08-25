@@ -15,9 +15,9 @@
 
 ConnectToSQL s;
 //char Buffer2[256] = { '\0' };
-std::thread bluThread;
+//std::thread bluThread;
 //std::thread opThread;
-std::thread cthread;
+//std::thread cthread;
 void ComponentDirector::OnBeforeSimulation(_In_ float32_t delta)
 {
    
@@ -26,6 +26,7 @@ void ComponentDirector::OnBeforeSimulation(_In_ float32_t delta)
 
 void ComponentDirector::OnRenderMainWindow()
 {
+    //creates start ambush mission button in the debug window
     bool32_t pressed = FALSE;
     SDKCheck(Gears::API::IMGuiAPIv1()->Button("Start Ambush Mission", { 180.0f, 30.0f }, &pressed));
     if (pressed != FALSE)
@@ -38,45 +39,45 @@ void ComponentDirector::OnRenderMainWindow()
 
 void ComponentDirector::OnRenderCustomWindow()
 {
-    bool32_t windowOpen = TRUE;
-    Gears::API::IMGuiAPIv1()->Begin("Quantico_GetDataSample", ImGuiWindowFlags_v1::kImGuiWindowFlags_ShowBorders, nullptr, &windowOpen);
-    if (windowOpen != FALSE)
-    {
-       /* bool32_t pressed = FALSE;
-        SDKCheck(Gears::API::IMGuiAPIv1()->Button("Run", { 180.0f, 30.0f }, &pressed));
-        if (pressed != FALSE)
-        {
-            makeSoldierRun();
-        }
-        Gears::API::IMGuiAPIv1()->End();*/
-        
-        //bool32_t pressed = FALSE;
-        bool32_t pressed2 = FALSE;
-        bool32_t wayPointPressed = FALSE;
-        //bool32_t textEntered = FALSE;
-        //char Buffer[256];
-        //SDKCheck(Gears::API::IMGuiAPIv1()->Button("recieveCommand", { 180.0f, 30.0f }, &pressed));
-        //if (pressed != FALSE)
-        //{
-        //    
-        //    //cthread = std::thread(&ComponentDirector::commandThread, this);
-        //}
-        //clock_t this_time = clock();
-        int messageID = 0;
-        SDKCheck(Gears::API::IMGuiAPIv1()->Button("sendData", { 180.0f, 30.0f }, &pressed2));
-        if (pressed2 != FALSE)
-        {
-            //std::string send = getBluForSoldierInfo("RS3");
-           bluThread= std::thread (&ComponentDirector::bluForThread, this, messageID + 1);   
-           //opThread = std::thread(&ComponentDirector::opForThread, this, messageID + 1);
-            //s.sendMessage(send);
-           // s.recieveMessage();
-        }
-        SDKCheck(Gears::API::IMGuiAPIv1()->Button("Create Waypoint", { 180.0f, 30.0f }, &wayPointPressed));
-        if (wayPointPressed != FALSE)
-        {
-            cthread = std::thread(&ComponentDirector::waypointCommandThread, this);           
-        }
+    //bool32_t windowOpen = TRUE;
+    //Gears::API::IMGuiAPIv1()->Begin("Quantico_GetDataSample", ImGuiWindowFlags_v1::kImGuiWindowFlags_ShowBorders, nullptr, &windowOpen);
+    //if (windowOpen != FALSE)
+    //{
+    //   /* bool32_t pressed = FALSE;
+    //    SDKCheck(Gears::API::IMGuiAPIv1()->Button("Run", { 180.0f, 30.0f }, &pressed));
+    //    if (pressed != FALSE)
+    //    {
+    //        makeSoldierRun();
+    //    }
+    //    Gears::API::IMGuiAPIv1()->End();*/
+    //    
+    //    //bool32_t pressed = FALSE;
+    //    bool32_t pressed2 = FALSE;
+    //    bool32_t wayPointPressed = FALSE;
+    //    //bool32_t textEntered = FALSE;
+    //    //char Buffer[256];
+    //    //SDKCheck(Gears::API::IMGuiAPIv1()->Button("recieveCommand", { 180.0f, 30.0f }, &pressed));
+    //    //if (pressed != FALSE)
+    //    //{
+    //    //    
+    //    //    //cthread = std::thread(&ComponentDirector::commandThread, this);
+    //    //}
+    //    //clock_t this_time = clock();
+    //    int messageID = 0;
+    //    SDKCheck(Gears::API::IMGuiAPIv1()->Button("sendData", { 180.0f, 30.0f }, &pressed2));
+    //    if (pressed2 != FALSE)
+    //    {
+    //        //std::string send = getBluForSoldierInfo("RS3");
+    //       bluThread= std::thread (&ComponentDirector::bluForThread, this, messageID + 1);   
+    //       //opThread = std::thread(&ComponentDirector::opForThread, this, messageID + 1);
+    //        //s.sendMessage(send);
+    //       // s.recieveMessage();
+    //    }
+    //    SDKCheck(Gears::API::IMGuiAPIv1()->Button("Create Waypoint", { 180.0f, 30.0f }, &wayPointPressed));
+    //    if (wayPointPressed != FALSE)
+    //    {
+    //        cthread = std::thread(&ComponentDirector::waypointCommandThread, this);           
+    //    }
       // IMGui_ImGuiTextEditCallback_Func_v1 callback;
         //SDKCheck(Gears::API::IMGuiAPIv1()->InputText("Query", (int)_countof(Buffer2), (ImGuiInputTextFlags_v1::kImGuiInputTextFlags_EnterReturnsTrue),  NULL, NULL, Buffer2, &textEntered));
         //if (textEntered != FALSE)
@@ -155,13 +156,12 @@ void ComponentDirector::OnRenderCustomWindow()
         //        }
         //    }
         //}
-        Gears::API::IMGuiAPIv1()->End();
-    }
+      //  Gears::API::IMGuiAPIv1()->End();
+   // }
     
 }
 void ComponentDirector::waypointCommandThread()
-{
-    while (true) {
+{    
         std::string readCommand = s.ReadandRemoveWaypoint();
         OutputDebugString(readCommand.c_str());
         OutputDebugString("\n");
@@ -224,8 +224,7 @@ void ComponentDirector::waypointCommandThread()
 
             Gears::API::WaypointAspectAPIv2()->SetAssignedTo(waypoint, grp, -1);
         }
-        Sleep(1000);
-    }
+    
 }
 void ComponentDirector::commandThread()
 {
@@ -337,8 +336,7 @@ void ComponentDirector::dateTimeThread(int messageID)
 void ComponentDirector::bluForThread(int messageID)
 {
     // 4 units rs1, rs2, rs3, rs4
-    while (true)
-    {
+    
         if (_sample_started == true)
         {
             std::string send = getSoldierInfo("leftlead");
@@ -371,7 +369,7 @@ void ComponentDirector::bluForThread(int messageID)
         {
             OutputDebugString("Load RS Mission\n");
         }
-    }
+    
 }
 
 void ComponentDirector::opForThread(int messageID)
@@ -476,6 +474,14 @@ void ComponentDirector::OnObjectCreation(ObjectHandle_v3 object)
     OutputDebugString("Soldier inserted in map ");
     OutputDebugString(name);
     OutputDebugString("\n");
+    
+}
+
+void ComponentDirector::OnEnemyFire()
+{
+    int messageID = 0;
+    bluForThread(messageID);
+    waypointCommandThread();
     
 }
 void ComponentDirector::OnMissionStart(_In_ bool32_t restart)

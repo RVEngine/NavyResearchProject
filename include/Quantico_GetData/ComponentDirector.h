@@ -17,6 +17,7 @@ public:
     void OnRenderMainWindow();
     void OnRenderCustomWindow();
     void OnObjectCreation(ObjectHandle_v3 object);
+    void OnEnemyFire();
     void OnMissionStart(_In_ bool32_t restart);
     void OnMissionEnd(_In_ bool32_t restart);
     void dateTimeThread(int messageID);
