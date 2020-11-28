@@ -12,11 +12,17 @@ In this project we insert waypoints into a database table using a python script.
 
 Features
 --------
-
 - Create Waypoint
 - Retrieve Unit Info
 - Detect enemy fire
 - Log enemy fire
+
+Database Structure
+------------------
+-blufor(unit_ID serial PRIMARY KEY, unit_name VARCHAR (50) UNIQUE NOT NULL, unit_health VARCHAR (50) NOT NULL,
+ unit_ammo VARCHAR (50), unit_type VARCHAR (50), px VARCHAR (50) NOT NULL, py VARCHAR (50) NOT NULL, pz VARCHAR (50) NOT NULL, unit_orientation VARCHAR (50), unit_velocity VARCHAR (50))
+-enemyfire(unit_ID serial PRIMARY KEY,	unit_name VARCHAR (50) UNIQUE NOT NULL, time VARCHAR (50)
+-waypointcommands2(commandID serial PRIMARY KEY, command VARCHAR (50) NOT NULL, x VARCHAR (50) NOT NULL, y VARCHAR (50) NOT NULL, z VARCHAR (50) NOT NULL, unit1 VARCHAR (50) NOT NULL,	unit2 VARCHAR (50), unit3 VARCHAR (50), unit4 VARCHAR (50))
 
 Installation
 ------------
