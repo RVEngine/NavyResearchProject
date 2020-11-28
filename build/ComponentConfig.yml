@@ -7,8 +7,10 @@ ImplementedAPIs:
   Version: 6
 - Name: ApplicationListenerAPI
   Version: 1
-- Name: ControlAIAspectAPI
-  Version: 1
+- Name: ControlAIListenerAPI
+  Version: 2
+- Name: DamageAspectListenerAPI
+  Version: 2
 - Name: DebugUIListenerAPI
   Version: 2
 - Name: MissionEditorAPI
@@ -74,12 +76,24 @@ Dependencies:
     Version: 2
   - Name: pqxx
     Version: 7.1.10
+  - Name: VBS3AIAspectAPI
+    Version: 2
+  - Name: VBS3ApplicationAPI
+    Version: 2
+  - Name: ControlAIAPI
+    Version: 2
+  - Name: StructuredDataAPI
+    Version: 1
+  - Name: ControlAIAspectAPI
+    Version: 1
   - Name: ComponentAPI
     Version: 6
   - Name: ApplicationListenerAPI
     Version: 1
-  - Name: ControlAIAspectAPI
-    Version: 1
+  - Name: ControlAIListenerAPI
+    Version: 2
+  - Name: DamageAspectListenerAPI
+    Version: 2
   - Name: DebugUIListenerAPI
     Version: 2
   - Name: MissionEditorAPI
@@ -113,8 +127,10 @@ Dependencies:
     Version: 6
   - Name: ApplicationListenerAPI
     Version: 1
-  - Name: ControlAIAspectAPI
-    Version: 1
+  - Name: ControlAIListenerAPI
+    Version: 2
+  - Name: DamageAspectListenerAPI
+    Version: 2
   - Name: DebugUIListenerAPI
     Version: 2
   - Name: MissionEditorAPI
@@ -151,8 +167,10 @@ Dependencies:
     Version: 6
   - Name: ApplicationListenerAPI
     Version: 1
-  - Name: ControlAIAspectAPI
-    Version: 1
+  - Name: ControlAIListenerAPI
+    Version: 2
+  - Name: DamageAspectListenerAPI
+    Version: 2
   - Name: DebugUIListenerAPI
     Version: 2
   - Name: MissionEditorAPI

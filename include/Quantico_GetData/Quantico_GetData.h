@@ -13,7 +13,8 @@
 
 #include <ComponentAPI.h>
 #include <ApplicationListenerAPI.h>
-#include <ControlAIAspectAPI.h>
+#include <ControlAIListenerAPI.h>
+#include <DamageAspectListenerAPI.h>
 #include <DebugUIListenerAPI.h>
 #include <MissionEditorAPI.h>
 #include <MissionEditorListenerAPI.h>
@@ -32,12 +33,12 @@ APIResult GEARS_API Component_GetVersion(_Inout_ int32_t* version_length, _Out_o
 APIResult GEARS_API ApplicationListener_OnBeforeSimulation(_In_ float32_t delta);
 APIResult GEARS_API ApplicationListener_OnAfterSimulation(_In_ float32_t delta);
 
-APIResult GEARS_API ControlAIAspect_HasAspect(_In_ ObjectHandle_v3 object, _Out_ bool32_t* has_aspect);
-APIResult GEARS_API ControlAIAspect_ReceiveMessage(_In_ ObjectHandle_v3 object, _In_ const char* subject, _In_ const char* parameters, _In_ int32_t parameters_size);
-APIResult GEARS_API ControlAIAspect_SetBehaviorTree(_In_ ObjectHandle_v3 object, _In_ const char* bt_name);
-APIResult GEARS_API ControlAIAspect_GetBehaviorTree(_In_ ObjectHandle_v3 object, _Out_ char* buffer_bt_name, _Inout_ int32_t* buffer_size);
-APIResult GEARS_API ControlAIAspect_SetBlackboardVariable(_In_ ObjectHandle_v3 object, _In_ const char* variable, _In_ const char* value, _In_ int32_t value_size);
-APIResult GEARS_API ControlAIAspect_GetBlackboardVariable(_In_ ObjectHandle_v3 object, _In_ const char* variable, _Out_ char* value, _Inout_ int32_t* value_size);
+void GEARS_API ControlAIListener_OnMessage(_In_ ObjectHandle_v3 sender, _In_ const char* subject, _In_ const char* parameters, _In_ int32_t parameters_size);
+void GEARS_API ControlAIListener_OnError(_In_ const char* error_message);
+
+APIResult GEARS_API DamageAspectListener_OnDamageChange(_In_ ObjectHandle_v3 object, _In_ ObjectHandle_v3 source, _In_ float32_t damage);
+APIResult GEARS_API DamageAspectListener_OnDestruction(_In_ ObjectHandle_v3 object, _In_ ObjectHandle_v3 source);
+APIResult GEARS_API DamageAspectListener_OnHit(_In_ const HitEvent_v2* hit_info);
 
 void GEARS_API DebugUIListener_OnRenderMainWindow();
 void GEARS_API DebugUIListener_OnRenderCustomWindow();

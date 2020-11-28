@@ -173,6 +173,8 @@ exit 0</Command>
     <ClInclude Include="..\..\include\Quantico_GetData\ConnectToSQL.h" />
     <ClInclude Include="..\..\include\Quantico_GetData\Gears.h" />
     <ClInclude Include="..\..\include\Quantico_GetData\Quantico_GetData.h" />
+    <ClInclude Include="..\..\include\Quantico_GetData\Utilities\StructuredDataWrapper.hpp" />
+    <ClInclude Include="..\..\include\Quantico_GetData\Utilities\Utilitiy.h" />
     <ClInclude Include="..\..\include\Quantico_GetData\Utility.h" />
     <ClInclude Include="..\..\include\Resources\Version.h" />
     <ClInclude Include="resource.h" />
@@ -183,6 +185,8 @@ exit 0</Command>
     <ClCompile Include="..\..\src\Quantico_GetData\ComponentDirector.cpp" />
     <ClCompile Include="..\..\src\Quantico_GetData\ConnectToSQL.cpp" />
     <ClCompile Include="..\..\src\Quantico_GetData\Quantico_GetData.cpp" />
+    <ClCompile Include="..\..\src\Quantico_GetData\Utilities\StructuredDataWrapper.cpp" />
+    <ClCompile Include="..\..\src\Quantico_GetData\Utilities\Utility.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Quantico_GetDataLibrary.rc" />

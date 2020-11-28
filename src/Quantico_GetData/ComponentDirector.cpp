@@ -10,18 +10,38 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <thread>
-
+#include <chrono>
+#include "Utilities/StructuredDataWrapper.hpp"
 
 
 ConnectToSQL s;
+std::chrono::steady_clock::time_point begin;
 //char Buffer2[256] = { '\0' };
 //std::thread bluThread;
 //std::thread opThread;
 //std::thread cthread;
+double recordTime = 0;
+std::thread timeThread;
+int posID = 0;
+int bluforID = 0;
+bool test = false;
+
 void ComponentDirector::OnBeforeSimulation(_In_ float32_t delta)
-{
-   
-    
+{   
+    bool _auto_restart_mission = true;
+    if (_auto_restart_mission)
+    {
+        Vbs3ApplicationState_v1 current_state = Vbs3ApplicationState_v1::kVbs3ApplicationState_unknown;
+        Gears::API::VBS3ApplicationAPIv2()->GetCurrentState(&current_state);
+
+        if (current_state == Vbs3ApplicationState_v1::kVbs3ApplicationState_debriefing)
+        {
+            _auto_restart_mission = false;
+
+            Gears::API::MissionAPIv4()->StartMission("Ambush_At_Dusk_ControlAI_Far.map_tropicalgeotypical25km", TRUE);
+           
+        }
+    }
 }
 
 void ComponentDirector::OnRenderMainWindow()
@@ -32,24 +52,83 @@ void ComponentDirector::OnRenderMainWindow()
     if (pressed != FALSE)
     {
         _sample_started = true;
-
-        SDKCheck(Gears::API::MissionAPIv4()->StartMission("Ambush_At_Dusk.map_tropicalgeotypical25km", TRUE));
+        begin = std::chrono::steady_clock::now();
+        SDKCheck(Gears::API::MissionAPIv4()->StartMission("Ambush_At_Dusk_ControlAI_Far.map_tropicalgeotypical25km", TRUE));
+        timeThread = std::thread(&ComponentDirector::ElapsedTime, this);
     }
 }
+void ComponentDirector::ElapsedTime()
+{
+    while (true)
+    {
+        std::chrono::steady_clock::time_point end = std::chrono::steady_clock::now();
+        elapsed_time = (std::chrono::duration_cast<std::chrono::microseconds>(end - begin).count()) / 1000000.0;
+        std::string unitArray[] = { "rightlead","rightgunner","r3","r4", "mlead","mgunner","m3","m4", "leftlead","leftgunner","l3","l4","erightlead","eright2","eright3","eright4", "emlead","em2","em3","em4", "eleftlead","eleft2","eleft3","eleft4" };
+        if (elapsed_time > recordTime)
+        {
+            
+            for (std::string unit : unitArray)
+            {
+               
+                DateTime_v3 time;
+                Gears::API::EnvironmentAPIv3()->GetTime(&time);
+                ObjectHandle_v3 _Soldier;
+                _Soldier = kNullObjectHandle;
+                auto it = soldierMap.find(unit);
+                if (it != soldierMap.end())
+                    _Soldier = it->second;
+                std::stringstream stream;
+                stream << time.hour << ":" << time.minute << ":" << time.second;
+                std::string visibleEnemies = myVisibility(_Soldier);
+                char* cstr = new char[unit.length() + 1];
+                strcpy(cstr, unit.c_str());
+                std::string send = getSoldierInfo(cstr) + ";" + visibleEnemies;
+                s.sendPosition(send, posID, stream.str());
+                posID++;
+            }
+            recordTime += 5;
+        }
 
+    }
+}
 void ComponentDirector::OnRenderCustomWindow()
 {
+  /*bool32_t windowOpen = TRUE;
+  Gears::API::IMGuiAPIv1()->Begin("Quantico_GetDataSample", ImGuiWindowFlags_v1::kImGuiWindowFlags_ShowBorders, nullptr, &windowOpen);
+  if (windowOpen != FALSE)
+  {
+      if (soldierMap.empty() == false) {
+          DisplayMoveToUI();
+
+          DisplayGroupMoveToUI();
+
+          DisplayRuleOfEngagementUI();
+      }
+    Gears::API::IMGuiAPIv1()->End();
+
+  }*/
+
+
     //bool32_t windowOpen = TRUE;
     //Gears::API::IMGuiAPIv1()->Begin("Quantico_GetDataSample", ImGuiWindowFlags_v1::kImGuiWindowFlags_ShowBorders, nullptr, &windowOpen);
     //if (windowOpen != FALSE)
     //{
-    //   /* bool32_t pressed = FALSE;
-    //    SDKCheck(Gears::API::IMGuiAPIv1()->Button("Run", { 180.0f, 30.0f }, &pressed));
+    //    bool32_t pressed = FALSE;
+    //    SDKCheck(Gears::API::IMGuiAPIv1()->Button("Change Current Weapon", { 180.0f, 30.0f }, &pressed));
     //    if (pressed != FALSE)
     //    {
-    //        makeSoldierRun();
+    //        auto it = soldierMap.find("rightlead");
+    //        ObjectHandle_v3 soldier = kNullObjectHandle;
+    //        if (it != soldierMap.end())
+    //        {
+    //            soldier = it->second;
+    //            
+    //            //Gears::API::WeaponSystemAspectAPIv6()->SetActiveWeaponType(soldier, kWeaponType_Special);
+    //            Gears::API::WeaponSystemAspectAPIv6()->SetActiveWeapon(soldier, 2, kWeaponAspectAutoSelectValue, kWeaponAspectAutoSelectValue, kWeaponAspectAutoSelectValue);
+    //        }
     //    }
-    //    Gears::API::IMGuiAPIv1()->End();*/
+    //    Gears::API::IMGuiAPIv1()->End();
+    //}
     //    
     //    //bool32_t pressed = FALSE;
     //    bool32_t pressed2 = FALSE;
@@ -160,20 +239,24 @@ void ComponentDirector::OnRenderCustomWindow()
    // }
     
 }
-void ComponentDirector::waypointCommandThread()
-{    
-        std::string readCommand = s.ReadandRemoveWaypoint();
-        OutputDebugString(readCommand.c_str());
-        OutputDebugString("\n");
+
+void ComponentDirector::moveUnits()
+{
+    std::string readCommand = s.ReadandRemoveMovementCommand();
+    //OutputDebugString(readCommand.c_str());
+    //OutputDebugString("\n");
+    if (readCommand.size() > 4)
+    {
+        //split readcommand into substrings of needed items
         std::size_t pos = readCommand.find(",");
-        std::string command = readCommand.substr(0, pos);
+        std::string solo = readCommand.substr(0, pos);
 
         std::size_t found = readCommand.find(",", pos + 1);
         std::string x = readCommand.substr(pos + 1, found - (pos + 1));
 
         std::size_t found2 = readCommand.find(",", found + 1);
         std::string y = readCommand.substr(found + 1, found2 - (found + 1));
-
+    
         std::size_t found3 = readCommand.find(",", found2 + 1);
         std::string z = readCommand.substr(found2 + 1, found3 - (found2 + 1));
 
@@ -181,50 +264,166 @@ void ComponentDirector::waypointCommandThread()
         std::string unit1 = readCommand.substr(found3 + 1, found4 - (found3 + 1));
 
         std::size_t found5 = readCommand.find(",", found4 + 1);
-        std::string unit2 = readCommand.substr(found4 + 1, found5 - (found4 + 1));
+        std::string roe = readCommand.substr(found4 + 1, found5 - (found4 + 1));
 
-        std::size_t found6 = readCommand.find(",", found5 + 1);
-        std::string unit3 = readCommand.substr(found5 + 1, found6 - (found5 + 1));
-
-        std::size_t found7 = readCommand.find(",", found6 + 1);
-        std::string unit4 = readCommand.substr(found6 + 1, found7 - (found6 + 1));
-        if (unit1.length() > 1)
+        auto it = soldierMap.find(unit1);
+        ObjectHandle_v3 soldier = kNullObjectHandle;
+        if (it != soldierMap.end())
+            soldier = it->second;
+        int32_t ruleValue = 0;
+        if (roe.compare("2") == 0)
         {
-            auto it = soldierMap.find(unit1);
-            ObjectHandle_v3 soldier = kNullObjectHandle;
-            if (it != soldierMap.end())
-                soldier = it->second;
-            ObjectHandle_v3 grp = kNullObjectHandle;
-            Gears::API::WorldAPIv6()->CreateGroup(kFaction_blufor, &grp);
-            Gears::API::ORBATAPIv2()->SetSuperiorGroup(soldier, grp);
-            it = soldierMap.find(unit2);
-            if (it != soldierMap.end())
-                soldier = it->second;
-            Gears::API::ORBATAPIv2()->SetSuperiorGroup(soldier, grp);
-            it = soldierMap.find(unit3);
-            if (it != soldierMap.end())
-                soldier = it->second;
-            Gears::API::ORBATAPIv2()->SetSuperiorGroup(soldier, grp);
-            it = soldierMap.find(unit4);
-            if (it != soldierMap.end())
-                soldier = it->second;
-            Gears::API::ORBATAPIv2()->SetSuperiorGroup(soldier, grp);
-            ObjectHandle_v3 waypoint;
-            Gears::API::WorldAPIv6()->CreateWaypoint(&waypoint);
-            Gears::API::WaypointAspectAPIv2()->SetType(waypoint, kWaypointType_hold);
-            GeoPosition_v5 position = {};
-            Gears::API::TransformationAspectAPIv5()->GetPosition(soldier, &position);
-            Vector3f64_v3 soldierMaposition = {};
-            // x,y,z in vbs3 coordinates are shown in x,z,y
-            Vector3f64_v3 mapposition = { std::stod(x),std::stod(y),std::stod(z) };
-            Gears::API::WorldAPIv6()->GeoPositionToMapPosition(position, &soldierMaposition);
-            Gears::API::WorldAPIv6()->MapPositionToGeoPosition(mapposition, &position);
-
-            Gears::API::TransformationAspectAPIv5()->SetPosition(waypoint, position);
-
-            Gears::API::WaypointAspectAPIv2()->SetAssignedTo(waypoint, grp, -1);
+            ruleValue = 2;
         }
-    
+        SetRuleOfEngagement(soldier, ruleValue);
+        Vector3f64_v3 mapposition = { std::stod(x),std::stod(y),std::stod(z) };
+        if (solo.compare("yes") == 0)
+        {
+            OrderMoveCommand(soldier, mapposition);
+        }
+        else
+        {
+            TeamOrderMoveCommand(soldier, mapposition);
+        }
+    }
+}
+void ComponentDirector::waypointCommandThread()
+{    
+        std::string readCommand = s.ReadandRemoveWaypoint();
+        //OutputDebugString(readCommand.c_str());
+        //OutputDebugString("\n");
+        if (readCommand.size() > 10)
+        {
+            //split readcommand into substrings of needed items
+            std::size_t pos = readCommand.find(",");
+            std::string command = readCommand.substr(0, pos);
+
+            std::size_t found = readCommand.find(",", pos + 1);
+            std::string x = readCommand.substr(pos + 1, found - (pos + 1));
+
+            std::size_t found2 = readCommand.find(",", found + 1);
+            std::string y = readCommand.substr(found + 1, found2 - (found + 1));
+
+            std::size_t found3 = readCommand.find(",", found2 + 1);
+            std::string z = readCommand.substr(found2 + 1, found3 - (found2 + 1));
+
+            std::size_t found4 = readCommand.find(",", found3 + 1);
+            std::string unit1 = readCommand.substr(found3 + 1, found4 - (found3 + 1));
+
+            std::size_t found5 = readCommand.find(",", found4 + 1);
+            std::string unit2 = readCommand.substr(found4 + 1, found5 - (found4 + 1));
+
+            std::size_t found6 = readCommand.find(",", found5 + 1);
+            std::string unit3 = readCommand.substr(found5 + 1, found6 - (found5 + 1));
+
+            std::size_t found7 = readCommand.find(",", found6 + 1);
+            std::string unit4 = readCommand.substr(found6 + 1, found7 - (found6 + 1));
+
+            std::size_t found8 = readCommand.find(",", found7 + 1);
+            std::string combatmode = readCommand.substr(found7 + 1, found8 - (found7 + 1));
+
+            std::size_t found9 = readCommand.find(",", found8 + 1);
+            std::string behavior = readCommand.substr(found8 + 1, found9 - (found8 + 1));
+
+            if (unit1.length() > 1)
+            {
+                auto it = soldierMap.find(unit1);
+                ObjectHandle_v3 soldier = kNullObjectHandle;
+                if (it != soldierMap.end())
+                    soldier = it->second;
+                //find soldier from map add to group
+                ObjectHandle_v3 grp = kNullObjectHandle;
+                Gears::API::WorldAPIv6()->CreateGroup(kFaction_blufor, &grp);
+                Gears::API::ORBATAPIv2()->SetSuperiorGroup(soldier, grp);
+                it = soldierMap.find(unit2);
+                if (it != soldierMap.end())
+                    soldier = it->second;
+                Gears::API::ORBATAPIv2()->SetSuperiorGroup(soldier, grp);
+                it = soldierMap.find(unit3);
+                if (it != soldierMap.end())
+                    soldier = it->second;
+                Gears::API::ORBATAPIv2()->SetSuperiorGroup(soldier, grp);
+                it = soldierMap.find(unit4);
+                if (it != soldierMap.end())
+                    soldier = it->second;
+                Gears::API::ORBATAPIv2()->SetSuperiorGroup(soldier, grp);
+                ObjectHandle_v3 waypoint;
+                Gears::API::WorldAPIv6()->CreateWaypoint(&waypoint);
+                Gears::API::WaypointAspectAPIv2()->SetType(waypoint, kWaypointType_hold);
+                GeoPosition_v5 position = {};
+                //Gears::API::TransformationAspectAPIv5()->GetPosition(soldier, &position);
+                Vector3f64_v3 soldierMaposition = {};
+                // x,y,z in vbs3 coordinates are shown in x,z,y
+                Vector3f64_v3 mapposition = { std::stod(x),std::stod(y),std::stod(z) };
+                //Gears::API::WorldAPIv6()->GeoPositionToMapPosition(position, &soldierMaposition);
+                Gears::API::WorldAPIv6()->MapPositionToGeoPosition(mapposition, &position);
+                Gears::API::TransformationAspectAPIv5()->SetPosition(waypoint, position);
+                Gears::API::WorldAPIv6()->CreateObject("vbs2_visual_arrow_green", position, nullptr);
+                Gears::API::WaypointAspectAPIv2()->SetAssignedTo(waypoint, grp, -1);
+                CombatMode_v2 mode;
+                //Never fire
+                mode = kCombatMode_blue;
+                if (combatmode.compare("green") == 0)
+                {
+                    //Hold fire, defend only
+                    mode = kCombatMode_green;
+                }
+                if (combatmode.compare("white") == 0)
+                {
+                    //Hold fire, engage at will
+                    mode = kCombatMode_white;
+                }
+                if (combatmode.compare("yellow") == 0)
+                {
+                    //Fire at will
+                    mode = kCombatMode_yellow;
+                }
+                if (combatmode.compare("red") == 0)
+                {
+                    //Fire at will, engage at will
+                    mode = kCombatMode_red;
+                }
+                
+                BehaviorMode_v2 behaviormode;
+
+                //Never fire
+                behaviormode = kBehaviorMode_unchanged;
+
+                if (behavior.compare("careless") == 0)
+                {
+                    //Units try to stay on roads, not caring about any cover.
+                    behaviormode = kBehaviorMode_careless;
+                }
+                if (behavior.compare("safe") == 0)
+                {
+                    //Units try to stay on roads, not caring about any cover, similar to careless.
+                    behaviormode = kBehaviorMode_safe;
+                }
+                if (behavior.compare("aware") == 0)
+                {
+                    //Units try to stay on roads, ocassionally using cover.Units kneel down ocassionally.
+                    behaviormode = kBehaviorMode_aware;
+                }
+                if (combatmode.compare("combat") == 0)
+                {
+                    //Units try to utilize cover whenever possible. Units kneel down ocassionally. Driving lights are off (except aircraft marker lights).
+                    behaviormode = kBehaviorMode_combat;
+                }
+                if (combatmode.compare("stealth") == 0)
+                {
+                    //Units try to utilize cover whenever possible. Units prone most of the time. Driving lights are off (except aircraft marker lights).
+                    behaviormode = kBehaviorMode_stealth;
+                }
+
+                Gears::API::VBS3AIAspectAPIv2()->SetBehavior(grp, behaviormode);
+                Gears::API::VBS3AIAspectAPIv2()->SetCombatMode(grp, mode);
+                CombatMode_v2 setCombat;
+                Gears::API::VBS3AIAspectAPIv2()->GetCombatMode(grp, &setCombat);
+                std::stringstream combatStream;
+                combatStream << setCombat;
+                OutputDebugString(combatStream.str().c_str());
+            }
+        }
 }
 void ComponentDirector::commandThread()
 {
@@ -342,28 +541,39 @@ void ComponentDirector::bluForThread(int messageID)
             std::string send = getSoldierInfo("leftlead");
             s.UpdateBluFor(send, messageID);
             send = getSoldierInfo("leftgunner");
-            s.UpdateBluFor(send, messageID + 1);
+            messageID++;
+            s.UpdateBluFor(send, messageID);
             send = getSoldierInfo("l3");
-            s.UpdateBluFor(send, messageID + 2);
+            messageID++;
+            s.UpdateBluFor(send, messageID);
             send = getSoldierInfo("l4");
-            s.UpdateBluFor(send, messageID + 3);
+            messageID++;
+            s.UpdateBluFor(send, messageID);
             send = getSoldierInfo("mlead");
-            s.UpdateBluFor(send, messageID + 4);
+            messageID++;
+            s.UpdateBluFor(send, messageID);
             send = getSoldierInfo("mgunner");
-            s.UpdateBluFor(send, messageID + 5);
+            messageID++;
+            s.UpdateBluFor(send, messageID);
             send = getSoldierInfo("m3");
-            s.UpdateBluFor(send, messageID + 6);
+            messageID++;
+            s.UpdateBluFor(send, messageID);
             send = getSoldierInfo("m4");
-            s.UpdateBluFor(send, messageID + 7);
+            messageID++;
+            s.UpdateBluFor(send, messageID);
             send = getSoldierInfo("rightlead");
-            s.UpdateBluFor(send, messageID + 8);
+            messageID++;
+            s.UpdateBluFor(send, messageID);
             send = getSoldierInfo("rightgunner");
-            s.UpdateBluFor(send, messageID + 9);
+            messageID++;
+            s.UpdateBluFor(send, messageID);
             send = getSoldierInfo("r3");
-            s.UpdateBluFor(send, messageID + 10);
+            messageID++;
+            s.UpdateBluFor(send, messageID);
             send = getSoldierInfo("r4");
-            s.UpdateBluFor(send, messageID + 11);
-            Sleep(10000);
+            messageID++;
+            s.UpdateBluFor(send, messageID);
+            bluforID = messageID;
         }
         else
         {
@@ -434,6 +644,12 @@ std::string ComponentDirector::getSoldierInfo(char* soldierName)
     std::stringstream ammoStream;
     ammoStream << ammo_count;
 
+    //unit_type
+    Faction_v3 faction;
+    Gears::API::ORBATAPIv2()->GetFaction(_bluForSoldier, &faction);
+    std::stringstream typeStream;
+    typeStream << faction;
+
     //unit_position
     GeoPosition_v5 position = {};
     Gears::API::TransformationAspectAPIv5()->GetPosition(_bluForSoldier, &position);
@@ -460,9 +676,9 @@ std::string ComponentDirector::getSoldierInfo(char* soldierName)
     veloStream << "{" << velocity.x << "," << velocity.y << "," << velocity.z << "}";
     
     //send string
-    send = std::string(soldierName) + ";" + damageStream.str() + ";" + ammoStream.str() + "; unit_type; " + posX.str() + ";" + posY.str() + ";" + posZ.str() + ";" + orientStream.str() + ";" + veloStream.str();
-    OutputDebugString(send.c_str());
-    OutputDebugString("\n");
+    send = std::string(soldierName) + ";" + damageStream.str() + ";" + ammoStream.str() + ";" + typeStream.str() + ";" + posX.str() + ";" + posY.str() + ";" + posZ.str() + ";" + orientStream.str() + ";" + veloStream.str();
+    //OutputDebugString(send.c_str());
+    //OutputDebugString("\n");
     return send;
 }
 void ComponentDirector::OnObjectCreation(ObjectHandle_v3 object)
@@ -470,24 +686,56 @@ void ComponentDirector::OnObjectCreation(ObjectHandle_v3 object)
     char name[256];
     int32_t size = 256;
     Gears::API::ScriptAPIv3()->GetVariableName(object, name, &size);
-    soldierMap.insert(std::pair<std::string, ObjectHandle_v3>(name, object));
-    OutputDebugString("Soldier inserted in map ");
-    OutputDebugString(name);
-    OutputDebugString("\n");
+    auto result = soldierMap.insert(std::pair<std::string, ObjectHandle_v3>(name, object));
     
+    // *Note:* Save the name of the soldier in a vector. This is for Testing / Debugging only.
+    _soldierNames.push_back(result.first->first.c_str());
+    //OutputDebugString("Soldier inserted in map");
+
+}
+
+void ComponentDirector::OnFire(ObjectHandle_v3 object, int messageID, DateTime_v3 time)
+{
+    char name[256];
+    int32_t size = 256;
+    Gears::API::ScriptAPIv3()->GetVariableName(object, name, &size);
+    std::stringstream stream;
+    stream << time.hour << ":" << time.minute << ":" << time.second;
+    std::string visibleEnemies = myVisibility(object);
+    std::string send =  getSoldierInfo(name) + ";" + visibleEnemies;
+    s.sendFireData(send, messageID, stream.str());
 }
 
 void ComponentDirector::OnEnemyFire()
 {
-    int messageID = 0;
-    bluForThread(messageID);
-    waypointCommandThread();
-    
+    bluForThread(bluforID);
+    moveUnits();
+    bluforID=0;    
 }
 void ComponentDirector::OnMissionStart(_In_ bool32_t restart)
 {
-    if (_sample_started == true)
+    if (_sample_started == true && test == false)
     {
+        enemyVisiblity();
+        bluForThread(bluforID);
+        //14400 16100
+        auto it = soldierMap.find("rightlead");
+        ObjectHandle_v3 soldier = kNullObjectHandle;
+        if (it != soldierMap.end())
+            soldier = it->second;
+        Vector3f64_v3 mapposition = { 14400,0,16100 };
+        TeamOrderMoveCommand(soldier, mapposition);
+        it = soldierMap.find("mlead");
+        if (it != soldierMap.end())
+            soldier = it->second;;
+        TeamOrderMoveCommand(soldier, mapposition);
+        it = soldierMap.find("leftlead");
+        if (it != soldierMap.end())
+            soldier = it->second;
+        TeamOrderMoveCommand(soldier, mapposition);
+        test = true;
+      
+
         //Gears::API::WorldListenerAPIv2()->OnObjectCreation(_soldier);
        /* GeoPosition_v5 position;
         position.latitude = 39.58247;
@@ -534,6 +782,10 @@ void ComponentDirector::OnMissionStart(_In_ bool32_t restart)
 void ComponentDirector::OnMissionEnd(_In_ bool32_t restart)
 {
     _sample_started = false;
+
+    // Clear out the maps
+    soldierMap.clear();
+    _soldierNames.clear();
 }
 
 void ComponentDirector::makeSoldierRun(Vector3f32_v3 velocity)
@@ -551,5 +803,227 @@ void ComponentDirector::makeSoldierStop()
     Gears::API::TransformationAspectAPIv5()->SetModelVelocity(_soldier, { 0.0f,0.0f,0.0f });
 }
 
+std::string ComponentDirector::myVisibility(ObjectHandle_v3 object)
+{
+//check faction and get visibility
+    std::string bluForArray[] = { "rightlead","rightgunner","r3","r4", "mlead","mgunner","m3","m4", "leftlead","leftgunner","l3","l4" };
+    std::string opForArray[] = { "erightlead","eright2","eright3","eright4", "emlead","em2","em3","em4", "eleftlead","eleft2","eleft3","eleft4"};
+    Faction_v3 faction;
+    std::stringstream visbilitystream;
+    Gears::API::ORBATAPIv2()->GetFaction(object, &faction);
+    if (faction == kFaction_blufor)
+    {
+        for (std::string opFor : opForArray)
+        {
+            float32_t visibility = 0;
+            ObjectHandle_v3 opForsoldier = kNullObjectHandle;
+            auto it = soldierMap.find(opFor);
+            if (it != soldierMap.end())
+                opForsoldier = it->second;
+            Gears::API::WorldAPIv6()->CalculateVisibility(object, opForsoldier, &visibility);
+            float32_t damage = 0;
+            Gears::API::DamageAspectAPIv4()->GetDamage(opForsoldier, &damage);
+            if (visibility > 0 && damage < 1)
+            {
+                visbilitystream << opFor << ",";
+               
+            }
+        }
+        return visbilitystream.str();
+    }
+    else if (faction == kFaction_opfor)
+    {
+        for (std::string bluFor : bluForArray)
+        {
+            float32_t visibility = 0;
+            ObjectHandle_v3 bluForsoldier = kNullObjectHandle;
+            auto it = soldierMap.find(bluFor);
+            if (it != soldierMap.end())
+                bluForsoldier = it->second;
+            Gears::API::WorldAPIv6()->CalculateVisibility(object, bluForsoldier, &visibility);
+            float32_t damage = 0;
+            Gears::API::DamageAspectAPIv4()->GetDamage(bluForsoldier, &damage);
+            if (visibility > 0 && damage < 1)
+            {
+                visbilitystream << bluFor << ",";
 
+            }
+        }
+        return visbilitystream.str();
+    }
+    return "";
+}
 
+void ComponentDirector::enemyVisiblity()
+{
+    s.removeEnemyVisbility();
+    std::string bluForArray[] = { "rightlead","rightgunner","r3","r4", "mlead","mgunner","m3","m4", "leftlead","leftgunner","l3","l4" };
+    std::string opForArray[] = { "erightlead","eright2","eright3","eright4", "emlead","em2","em3","em4", "eleftlead","eleft2","eleft3","eleft4"};
+    int messageID = 0;
+    for (std::string opFor : opForArray)
+    {
+        for (std::string bluFor : bluForArray)
+        {
+            float32_t visibility = 0;
+            ObjectHandle_v3 opForsoldier = kNullObjectHandle;
+            auto it = soldierMap.find(opFor);
+            if (it != soldierMap.end())
+                opForsoldier = it->second;
+            ObjectHandle_v3 bluForsoldier = kNullObjectHandle;
+            it = soldierMap.find(opFor);
+            if (it != soldierMap.end())
+                bluForsoldier = it->second;
+            Gears::API::WorldAPIv6()->CalculateVisibility(opForsoldier, bluForsoldier, &visibility);
+            float32_t damage = 0;
+            Gears::API::DamageAspectAPIv4()->GetDamage(bluForsoldier, &damage);
+            if (visibility > 0 && damage<1)
+            {
+                
+                std::stringstream visbilitystream;
+                visbilitystream << opFor << ";" << bluFor << ";" << visibility;
+                s.setEnemyVisbility(visbilitystream.str(), messageID);
+                messageID++;
+            }
+        }
+
+    }
+}
+
+//! Function to tell a unit to follow another unit.
+//@param  unitToGiveCommand - Unit to tell to follow.
+//@param  unitToFollow - Unit to follow.
+void ComponentDirector::OrderFollowCommand(const ObjectHandle_v3& unitToGiveCommand, const ObjectHandle_v3& unitToFollow)
+{
+  BufferWriter writer(Gears::API::StructuredDataAPIv1());
+  writer(CollectionStart());
+  writer("behaviorName");
+  writer("follow");
+  writer("elementToFollow");
+  writer(unitToFollow);
+  writer(CollectionEnd());
+
+  std::vector<char> messageBuffer = writer.Result();
+
+  Gears::API::ControlAIAspectAPIv1()->ReceiveMessage(unitToGiveCommand, "NewOrder", messageBuffer.data(), static_cast<int32_t>(messageBuffer.size()));
+}
+
+//! Function to move a ControlAI object to.
+//@param  unitToGiveCommand - ObjectHandle to a unit (or group) that should move.
+//@param  movePosition - VBS Map Position to move to.
+void ComponentDirector::OrderMoveCommand(const ObjectHandle_v3& unitToGiveCommand, const Vector3f64_v3& movePosition)
+{
+  BufferWriter writer(Gears::API::StructuredDataAPIv1());
+  writer(CollectionStart());
+  writer("behaviorName");
+  writer("move");
+  writer("position");
+  writer(movePosition);
+  writer(CollectionEnd());
+
+  std::vector<char> messageBuffer = writer.Result();
+
+  SDKCheck(Gears::API::ControlAIAspectAPIv1()->ReceiveMessage(unitToGiveCommand, "NewOrder", messageBuffer.data(), static_cast<int32_t>(messageBuffer.size())));
+}
+
+//! Function to move a whole group to a given VBS Map Position. This function gets the whole group of any given unit, and tells the group to move as a whole.
+//@param  teamMember - ObjectHandle to a unit that is a part of the group that should move.
+//@param  movePosition - VBS Map Position to tell the group to move to.
+void ComponentDirector::TeamOrderMoveCommand(const ObjectHandle_v3& teamMember, const Vector3f64_v3& movePosition)
+{
+  // Get the group of the unit
+  ObjectHandle_v3 teamGroup = kNullObjectHandle;
+  if (APIRESULT_SUCCESS(Gears::API::ORBATAPIv2()->GetSuperiorGroup(teamMember, &teamGroup)) && teamGroup.id != kNullObjectHandle.id)
+  {
+    OrderMoveCommand(teamGroup, movePosition);
+  }
+}
+
+//! Function to set the Rule of Engagement value on a ControlAI Brain.
+//@param  controlAIObject - The object handle of either a ControlAI unit or Group
+//@param  ruleValue - Value of the ROE (as defined by the bahavior itself)  
+void ComponentDirector::SetRuleOfEngagement(const ObjectHandle_v3& controlAIObject, int32_t ruleValue)
+{
+  BufferWriter writer(Gears::API::StructuredDataAPIv1());
+  writer(CollectionStart());
+  writer("ruleName");
+  writer("roe"); // Mandatory
+  writer("ruleValue");
+  writer(static_cast<float64_t>(ruleValue)); // StructuredDataAPI doesn't support int32_t, so store as a float64_t
+  writer(CollectionEnd());
+
+  std::vector<char> messageBuffer = writer.Result();
+
+  SDKCheck(Gears::API::ControlAIAspectAPIv1()->ReceiveMessage(controlAIObject, "NewRule", messageBuffer.data(), static_cast<int32_t>(messageBuffer.size())));
+}
+
+void ComponentDirector::DisplayMoveToUI()
+{
+  // Let the user select which solider they want to move
+  static int32_t currentlySelectedMoveSoldier = 0;
+  SDKCheck(Gears::API::IMGuiAPIv1()->Combo("Soldier##Move", _soldierNames.data(), static_cast<int32_t>(_soldierNames.size()), 4, &currentlySelectedMoveSoldier, nullptr));
+
+  bool32_t pressed = FALSE;
+  SDKCheck(Gears::API::IMGuiAPIv1()->Button("Move Unit to Position", { 180.0f, 30.0f }, &pressed));
+  if (pressed != FALSE)
+  {
+    // Get the player
+    ObjectHandle_v3 player = kNullObjectHandle;
+    SDKCheck(Gears::API::MissionAPIv4()->GetPlayer(&player));
+
+    // Get the map position of the player
+    GeoPosition_v5 playerPosition = {};
+    SDKCheck(Gears::API::TransformationAspectAPIv5()->GetPosition(player, &playerPosition));
+    Vector3f64_v3 vbsMapPosition = {};
+    SDKCheck(Gears::API::WorldAPIv6()->GeoPositionToMapPosition(playerPosition, &vbsMapPosition));
+
+    // Move the whole group to the player's position
+    OrderMoveCommand(soldierMap[_soldierNames[currentlySelectedMoveSoldier]], vbsMapPosition);
+  }
+
+  SDKCheck(Gears::API::IMGuiAPIv1()->Separator());
+}
+
+void ComponentDirector::DisplayGroupMoveToUI()
+{
+  // Let the user select which solider they want to move
+  static int32_t currentlySelectedGroupSoldier = 0;
+  SDKCheck(Gears::API::IMGuiAPIv1()->Combo("Soldier##Group", _soldierNames.data(), static_cast<int32_t>(_soldierNames.size()), 4, &currentlySelectedGroupSoldier, nullptr));
+
+  bool32_t pressed = FALSE;
+  SDKCheck(Gears::API::IMGuiAPIv1()->Button("Move Group to Position", { 180.0f, 30.0f }, &pressed));
+  if (pressed != FALSE)
+  {
+    // Get the player
+    ObjectHandle_v3 player = kNullObjectHandle;
+    SDKCheck(Gears::API::MissionAPIv4()->GetPlayer(&player));
+
+    // Get the map position of the player
+    GeoPosition_v5 playerPosition = {};
+    SDKCheck(Gears::API::TransformationAspectAPIv5()->GetPosition(player, &playerPosition));
+    Vector3f64_v3 vbsMapPosition = {};
+    SDKCheck(Gears::API::WorldAPIv6()->GeoPositionToMapPosition(playerPosition, &vbsMapPosition));
+
+    // Move the whole group to the player's position
+    TeamOrderMoveCommand(soldierMap[_soldierNames[currentlySelectedGroupSoldier]], vbsMapPosition);
+  }
+
+  SDKCheck(Gears::API::IMGuiAPIv1()->Separator());
+}
+
+void ComponentDirector::DisplayRuleOfEngagementUI()
+{
+  // Let the user select which solider they want to set the ROE for
+  static int32_t currentlySelectedROESoldier = 0;
+  SDKCheck(Gears::API::IMGuiAPIv1()->Combo("Soldier##ROE", _soldierNames.data(), static_cast<int32_t>(_soldierNames.size()), 4, &currentlySelectedROESoldier, nullptr));
+
+  bool32_t changed = FALSE;
+  static int32_t currentROEValue = 0;
+  SDKCheck(Gears::API::IMGuiAPIv1()->InputInt("Rule of Engagement Value", 1, 1, ImGuiInputTextFlags_v1::kImGuiInputTextFlags_AlwaysInsertMode, &currentROEValue, &changed));
+
+  if (changed != FALSE)
+  {
+    SetRuleOfEngagement(soldierMap[_soldierNames[currentlySelectedROESoldier]], currentROEValue);
+  }
+
+  SDKCheck(Gears::API::IMGuiAPIv1()->Separator());
+}

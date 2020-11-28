@@ -144,6 +144,12 @@
 #include <WaypointAspectAPI.h>
 #include <ORBATAPI.h>
 #include <WeaponSystemAspectListenerAPI.h>
+#include <VBS3AIAspectAPI.h>
+#include <DamageAspectListenerAPI.h>
+#include <VBS3ApplicationAPI.h>
+#include <ControlAIAPI.h>
+#include <ControlAIListenerAPI.h>
+#include <StructuredDataAPI.h>
 
 class Gears : public APIHelper<Gears, APIManager_v6>
 {
@@ -169,6 +175,12 @@ public:
   REGISTER_API(WaypointAspectAPI, 2, Single)
   REGISTER_API(ORBATAPI, 2, Single)
 //  REGISTER_API(WeaponSystemAspectListenerAPI, 2, Single)
+  REGISTER_API(VBS3AIAspectAPI, 2, Single)
+//  REGISTER_API(DamageAspectListenerAPI, 2, Single)
+  REGISTER_API(VBS3ApplicationAPI, 2, Single)
+  REGISTER_API(ControlAIAPI, 2, Single)
+  REGISTER_API(StructuredDataAPI, 1, Single)
+  REGISTER_API(ControlAIAspectAPI, 1, Single)
   END_APIS()
 
   START_MY_APIS(Gears)
@@ -178,13 +190,15 @@ public:
   REGISTER_MY_API(MissionEditorAPI, 2)
   REGISTER_MY_API(MissionListenerAPI, 3)
 //  REGISTER_MY_API(DebugUIAPI, 2)
-  REGISTER_MY_API(ControlAIAspectAPI, 1)
+//  REGISTER_MY_API(ControlAIAspectAPI, 1)
   REGISTER_MY_API(ApplicationListenerAPI, 1)
   REGISTER_MY_API(MissionEditorListenerAPI, 2)
   REGISTER_MY_API(DebugUIListenerAPI, 2)
   REGISTER_MY_API(WorldListenerAPI, 2)
 //  REGISTER_MY_API(WeaponSystemAspectListenerAPI, 2)
   REGISTER_MY_API(WeaponSystemAspectListenerAPI, 2)
+  REGISTER_MY_API(DamageAspectListenerAPI, 2)
+  REGISTER_MY_API(ControlAIListenerAPI, 2)
   END_MY_APIS()
 
 private:

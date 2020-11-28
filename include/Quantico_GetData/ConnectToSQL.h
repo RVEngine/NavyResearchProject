@@ -10,7 +10,12 @@ public:
     void UpdateOpFor(std::string message, int messageID);
     std::string ReadandRemove();
     std::string ReadandRemoveWaypoint();
-    void ConnectToSQL::UpdateFireTable(std::string message, int messageID);
+    void setEnemyVisbility(std::string message, int messageID);
+    void removeEnemyVisbility();
+    void sendFireData(std::string message, int messageID, std::string time);
+    void sendPosition(std::string message, int messageID, std::string time);
+    void UpdateFireTable(std::string message, int messageID);
+    std::string ConnectToSQL::ReadandRemoveMovementCommand();
     static ConnectToSQL& Get()
     {
         static ConnectToSQL instance;

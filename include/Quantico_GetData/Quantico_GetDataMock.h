@@ -13,7 +13,8 @@
 
 #include <ComponentAPI.h>
 #include <ApplicationListenerAPI.h>
-#include <ControlAIAspectAPI.h>
+#include <ControlAIListenerAPI.h>
+#include <DamageAspectListenerAPI.h>
 #include <DebugUIListenerAPI.h>
 #include <MissionEditorAPI.h>
 #include <MissionEditorListenerAPI.h>

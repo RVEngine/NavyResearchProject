@@ -56,14 +56,32 @@ Dependencies:
   Name: pqxx
   Version: 7.1.10
 - Group: Dependencies
+  Name: VBS3AIAspectAPI
+  Version: 2
+- Group: Dependencies
+  Name: VBS3ApplicationAPI
+  Version: 2
+- Group: Dependencies
+  Name: ControlAIAPI
+  Version: 2
+- Group: Dependencies
+  Name: StructuredDataAPI
+  Version: 1
+- Group: Dependencies
+  Name: ControlAIAspectAPI
+  Version: 1
+- Group: Dependencies
   Name: ComponentAPI
   Version: 6
 - Group: Dependencies
   Name: ApplicationListenerAPI
   Version: 1
 - Group: Dependencies
-  Name: ControlAIAspectAPI
-  Version: 1
+  Name: ControlAIListenerAPI
+  Version: 2
+- Group: Dependencies
+  Name: DamageAspectListenerAPI
+  Version: 2
 - Group: Dependencies
   Name: DebugUIListenerAPI
   Version: 2

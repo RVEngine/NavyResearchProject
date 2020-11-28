@@ -25,6 +25,11 @@
 #include <WeaponSystemAspectAPI.h>
 #include <WaypointAspectAPI.h>
 #include <ORBATAPI.h>
+#include <VBS3AIAspectAPI.h>
+#include <VBS3ApplicationAPI.h>
+#include <ControlAIAPI.h>
+#include <StructuredDataAPI.h>
+#include <ControlAIAspectAPI.h>
 
 GEARS_EXPORT void GEARS_API RegisterAPI_v6(APIManager_RegisterAPI_Func_v6 register_api)
 {
@@ -63,23 +68,35 @@ GEARS_EXPORT void GEARS_API RegisterAPI_v6(APIManager_RegisterAPI_Func_v6 regist
     register_api(ApplicationListenerAPI_Handle, &api_info);
   }
 
-  //Register ControlAIAspectAPI_v1
+  //Register ControlAIListenerAPI_v2
   {
-    static ControlAIAspectAPI_v1 api;
+    static ControlAIListenerAPI_v2 api;
     APIInfo_v6 api_info;
 
-    api.HasAspect = ControlAIAspect_HasAspect;
-    api.ReceiveMessage = ControlAIAspect_ReceiveMessage;
-    api.SetBehaviorTree = ControlAIAspect_SetBehaviorTree;
-    api.GetBehaviorTree = ControlAIAspect_GetBehaviorTree;
-    api.SetBlackboardVariable = ControlAIAspect_SetBlackboardVariable;
-    api.GetBlackboardVariable = ControlAIAspect_GetBlackboardVariable;
+    api.OnMessage = ControlAIListener_OnMessage;
+    api.OnError = ControlAIListener_OnError;
 
     api_info._api = &api;
-    api_info._version = 1;
+    api_info._version = 2;
     api_info._privilege = 0;
 
-    register_api(ControlAIAspectAPI_Handle, &api_info);
+    register_api(ControlAIListenerAPI_Handle, &api_info);
+  }
+
+  //Register DamageAspectListenerAPI_v2
+  {
+    static DamageAspectListenerAPI_v2 api;
+    APIInfo_v6 api_info;
+
+    api.OnDamageChange = DamageAspectListener_OnDamageChange;
+    api.OnDestruction = DamageAspectListener_OnDestruction;
+    api.OnHit = DamageAspectListener_OnHit;
+
+    api_info._api = &api;
+    api_info._version = 2;
+    api_info._privilege = 0;
+
+    register_api(DamageAspectListenerAPI_Handle, &api_info);
   }
 
   //Register DebugUIListenerAPI_v2
